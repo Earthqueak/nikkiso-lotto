@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลงทะเบียนผู้ร่วมงาน</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #4dabf7);
+    padding: 20px;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.logo img {
+    max-width: 120px;
+}
+
+h2 {
+    text-align: center;
+    color: #0d6efd;
+}
+
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #0b5ed7;
+}
+
+.result {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.result h1 {
+    color: #0d6efd;
+    margin: 10px 0;
+}
+
+.time {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+    <!-- ถ้ามีโลโก้ให้วางไฟล์ logo.png ไว้เดียวกับไฟล์นี้ -->
+    <img src="logo.png" alt="Event Logo">
+</div>
+
+<h2>ลงทะเบียนเข้างาน</h2>
+
+<div id="formSection">
+    <input type="text" id="fullname" placeholder="ชื่อ-สกุล">
+    <input type="tel" id="phone" placeholder="เบอร์โทร">
+    <input type="text" id="hospital" placeholder="โรงพยาบาล">
+    <button onclick="submitForm()">ลงทะเบียน</button>
+</div>
+
+<div id="resultSection" class="result hidden">
+    <h3>ลงทะเบียนสำเร็จ</h3>
+    <p>หมายเลขของคุณ</p>
+    <h1 id="queueNumber"></h1>
+
+    <p id="showName"></p>
+    <p id="showPhone"></p>
+    <p id="showHospital"></p>
+    <p class="time" id="showTime"></p>
+
+    <img id="qrCode" style="margin-top:15px;" alt="QR Code">
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe42UQec8GVJoMgS-RUgmeiKC3OgHyudWPymGjJQbt-vNsxbhjDXWtFAFsAFW1o7miEA/exec";
+
+function submitForm() {
+
+    const fullname = document.getElementById("fullname").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const hospital = document.getElementById("hospital").value.trim();
+
+    if (!fullname || !phone || !hospital) {
+        alert("กรุณากรอกข้อมูลให้ครบ");
+        return;
+    }
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            fullname: fullname,
+            phone: phone,
+            hospital: hospital
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "duplicate") {
+            alert("เบอร์นี้ลงทะเบียนแล้ว");
+            return;
+        }
+
+        const now = new Date().toLocaleString("th-TH");
+
+        document.getElementById("formSection").classList.add("hidden");
+        document.getElementById("resultSection").classList.remove("hidden");
+
+        document.getElementById("queueNumber").innerText = data.number;
+        document.getElementById("showName").innerText = "ชื่อ: " + fullname;
+        document.getElementById("showPhone").innerText = "เบอร์โทร: " + phone;
+        document.getElementById("showHospital").innerText = "โรงพยาบาล: " + hospital;
+        document.getElementById("showTime").innerText = "เวลาลงทะเบียน: " + now;
+
+        document.getElementById("qrCode").src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+          encodeURIComponent("หมายเลข: " + data.number);
+    })
+    .catch(() => {
+        alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");
+    });
+}
+</script>
+
+</body>
+</html>
