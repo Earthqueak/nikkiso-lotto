@@ -130,30 +130,38 @@ button:hover {
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe42UQec8GVJoMgS-RUgmeiKC3OgHyudWPymGjJQbt-vNsxbhjDXWtFAFsAFW1o7miEA/exec";
+let isSubmitting = false;
 
 function submitForm() {
 
+    if (isSubmitting) return; // กันกดซ้ำ
+    isSubmitting = true;
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerText = "กำลังบันทึก...";
+
     const fullname = document.getElementById("fullname").value.trim();
-    const phone = document.getElementById("phone").value.trim();
+    const phoneRaw = document.getElementById("phone").value.trim();
     const hospital = document.getElementById("hospital").value.trim();
 
-    if (!fullname || !phone || !hospital) {
+    if (!fullname || !phoneRaw || !hospital) {
         alert("กรุณากรอกข้อมูลให้ครบ");
+        resetButton();
         return;
     }
 
+    const phone = phoneRaw.replace(/\D/g, "");
+
     fetch(SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify({
-            fullname: fullname,
-            phone: phone,
-            hospital: hospital
-        })
+        body: JSON.stringify({ fullname, phone, hospital })
     })
     .then(res => res.json())
     .then(data => {
         if (data.status === "duplicate") {
             alert("เบอร์นี้ลงทะเบียนแล้ว");
+            resetButton();
             return;
         }
 
@@ -173,8 +181,16 @@ function submitForm() {
           encodeURIComponent("หมายเลข: " + data.number);
     })
     .catch(() => {
-        alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");
+        alert("เกิดข้อผิดพลาด");
+        resetButton();
     });
+}
+
+function resetButton() {
+    isSubmitting = false;
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = false;
+    btn.innerText = "ลงทะเบียน";
 }
 </script>
 
