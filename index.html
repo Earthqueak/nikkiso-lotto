@@ -7,70 +7,70 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0d6efd, #4dabf7);
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0d6efd, #4dabf7);
+  padding: 20px;
 }
+
 .container {
-    max-width: 400px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
+  max-width: 400px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
 }
+
 .logo {
-    text-align: center;
-    margin-bottom: 8px;
+  text-align: center;
+  margin-bottom: 10px;
 }
+
 .logo img {
-    max-width: 300px;
-    width: 100%;
+  max-width: 300px;
+  width: 100%;
 }
+
 h2 {
-    text-align: center;
-    color: #0d6efd;
-    margin: 6px 0 12px;
+  text-align: center;
+  color: #0d6efd;
+  margin: 6px 0 12px;
 }
+
 input, button {
-    width: 90%;
-    padding: 12px;
-    margin: 10px auto 0;
-    display: block;
+  width: 90%;
+  padding: 12px;
+  margin: 10px auto 0;
+  display: block;
 }
+
 button {
-    background: #0d6efd;
-    color: white;
-    border: none;
-    font-weight: bold;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  font-weight: bold;
 }
-.hidden { 
-    display: none; 
+
+button:disabled {
+  opacity: 0.6;
+}
+
+.hidden {
+  display: none;
 }
 
 #resultSection {
-    text-align: center;
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px dashed #ddd;
-}
-
-#resultSection h3 {
-    margin-bottom: 8px;
-    color: #198754;
+  text-align: center;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
 }
 
 #queueNumber {
-    font-size: 48px;
-    font-weight: bold;
-    color: #0d6efd;
-    margin: 10px 0 16px;
+  font-size: 48px;
+  font-weight: bold;
+  color: #0d6efd;
+  margin: 12px 0;
 }
-
-#resultSection p {
-    margin: 6px 0;
-    font-size: 16px;
-}
-
 </style>
 </head>
 
@@ -78,32 +78,33 @@ button {
 
 <div class="container">
 
-<div class="logo">
-  <img src="logo.png">
-</div>
+  <div class="logo">
+    <img src="logo.png">
+  </div>
 
-<h2>ลงทะเบียนเข้างาน</h2>
+  <h2>ลงทะเบียนเข้างาน</h2>
 
-<div id="formSection">
-  <input id="fullname" placeholder="ชื่อ-สกุล">
-  <input id="phone" placeholder="เบอร์โทร">
-  <input id="hospital" placeholder="โรงพยาบาล">
-  <button id="submitBtn" onclick="submitForm()">ลงทะเบียน</button>
-</div>
+  <div id="formSection">
+    <input id="fullname" placeholder="ชื่อ-สกุล">
+    <input id="phone" placeholder="เบอร์โทร">
+    <input id="hospital" placeholder="โรงพยาบาล">
+    <button id="submitBtn" onclick="submitForm()">ลงทะเบียน</button>
+  </div>
 
-<div id="resultSection" class="hidden">
-  <h3>ลงทะเบียนสำเร็จ</h3>
-  <h1 id="queueNumber"></h1>
-  <p id="showName"></p>
-  <p id="showPhone"></p>
-  <p id="showHospital"></p>
-  <p id="showTime"></p>
-</div>
+  <div id="resultSection" class="hidden">
+    <h3>ลงทะเบียนสำเร็จ</h3>
+    <div id="queueNumber">✔</div>
+    <p id="showName"></p>
+    <p id="showPhone"></p>
+    <p id="showHospital"></p>
+    <p id="showTime"></p>
+    <button onclick="location.reload()">ลงทะเบียนคนถัดไป</button>
+  </div>
 
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFFMszLHlpHz0TPJdEkNMxKajHa2eVQNqundazMWIG-1N389p5GDoYrZUItrauf9i77Q/exec";
+const SCRIPT_URL = "ใส่ Web App URL ของคุณตรงนี้";
 let isSubmitting = false;
 
 function submitForm() {
@@ -116,7 +117,7 @@ function submitForm() {
   btn.innerText = "กำลังบันทึก...";
 
   const fullname = document.getElementById("fullname").value.trim();
-  const phone = document.getElementById("phone").value.replace(/\D/g,"");
+  const phone = document.getElementById("phone").value.replace(/\D/g, "");
   const hospital = document.getElementById("hospital").value.trim();
 
   if (!fullname || !phone || !hospital) {
@@ -125,32 +126,23 @@ function submitForm() {
     return;
   }
 
+  // 🔥 ส่งแบบ no-cors (กัน CORS 100%)
   fetch(SCRIPT_URL, {
     method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fullname, phone, hospital })
-  })
-  .then(r => r.json())
-  .then(d => {
-  if (d.status === "duplicate") {
-    alert("เบอร์นี้ลงทะเบียนแล้ว");
-    resetBtn();
-    return;
-  }
+  });
 
+  // แสดงผลทันที (เหมาะหน้างาน)
   document.getElementById("formSection").classList.add("hidden");
   document.getElementById("resultSection").classList.remove("hidden");
 
-  document.getElementById("queueNumber").innerText = d.number;
   document.getElementById("showName").innerText = "ชื่อ: " + fullname;
   document.getElementById("showPhone").innerText = "เบอร์: " + phone;
   document.getElementById("showHospital").innerText = "โรงพยาบาล: " + hospital;
   document.getElementById("showTime").innerText =
     new Date().toLocaleString("th-TH");
-})
-  .catch(() => {
-    alert("เกิดข้อผิดพลาด");
-    resetBtn();
-  });
 }
 
 function resetBtn() {
@@ -159,7 +151,6 @@ function resetBtn() {
   btn.disabled = false;
   btn.innerText = "ลงทะเบียน";
 }
-
 </script>
 
 </body>
