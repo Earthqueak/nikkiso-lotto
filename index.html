@@ -43,7 +43,34 @@ button {
     border: none;
     font-weight: bold;
 }
-.hidden { display: none; }
+.hidden { 
+    display: none; 
+}
+
+#resultSection {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+}
+
+#resultSection h3 {
+    margin-bottom: 8px;
+    color: #198754;
+}
+
+#queueNumber {
+    font-size: 48px;
+    font-weight: bold;
+    color: #0d6efd;
+    margin: 10px 0 16px;
+}
+
+#resultSection p {
+    margin: 6px 0;
+    font-size: 16px;
+}
+
 </style>
 </head>
 
@@ -76,7 +103,7 @@ button {
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvTLeeXnQbnGQ5g3HlUfeOqHChVD_FFjbq55qJNac8MW3QZOWDeqXmfv94zsR7FpXRlw/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvcs6UHJoOSRWd2LeLV0hGxjuz3uuLf7KuIExgHaz3udxrSerAS3V8HkNklWU0X2-35A/exec";
 let isSubmitting = false;
 
 function submitForm() {
