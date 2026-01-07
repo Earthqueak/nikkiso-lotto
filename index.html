@@ -131,19 +131,22 @@ function submitForm() {
   })
   .then(r => r.json())
   .then(d => {
-    if (d.status === "duplicate") {
-      alert("เบอร์นี้ลงทะเบียนแล้ว");
-      resetBtn();
-      return;
-    }
-    formSection.classList.add("hidden");
-    resultSection.classList.remove("hidden");
-    queueNumber.innerText = d.number;
-    showName.innerText = "ชื่อ: " + fullname;
-    showPhone.innerText = "เบอร์: " + phone;
-    showHospital.innerText = "โรงพยาบาล: " + hospital;
-    showTime.innerText = new Date().toLocaleString("th-TH");
-  })
+  if (d.status === "duplicate") {
+    alert("เบอร์นี้ลงทะเบียนแล้ว");
+    resetBtn();
+    return;
+  }
+
+  document.getElementById("formSection").classList.add("hidden");
+  document.getElementById("resultSection").classList.remove("hidden");
+
+  document.getElementById("queueNumber").innerText = d.number;
+  document.getElementById("showName").innerText = "ชื่อ: " + fullname;
+  document.getElementById("showPhone").innerText = "เบอร์: " + phone;
+  document.getElementById("showHospital").innerText = "โรงพยาบาล: " + hospital;
+  document.getElementById("showTime").innerText =
+    new Date().toLocaleString("th-TH");
+})
   .catch(() => {
     alert("เกิดข้อผิดพลาด");
     resetBtn();
