@@ -88,9 +88,9 @@ function submitForm() {
   btn.disabled = true;
   btn.innerText = "กำลังบันทึก...";
 
-  const fullname = fullname.value.trim();
-  const phone = phone.value.replace(/\D/g,"");
-  const hospital = hospital.value.trim();
+  const fullname = document.getElementById("fullname").value.trim();
+  const phone = document.getElementById("phone").value.replace(/\D/g,"");
+  const hospital = document.getElementById("hospital").value.trim();
 
   if (!fullname || !phone || !hospital) {
     alert("กรุณากรอกข้อมูลให้ครบ");
@@ -125,9 +125,11 @@ function submitForm() {
 
 function resetBtn() {
   isSubmitting = false;
-  submitBtn.disabled = false;
-  submitBtn.innerText = "ลงทะเบียน";
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = false;
+  btn.innerText = "ลงทะเบียน";
 }
+
 </script>
 
 </body>
