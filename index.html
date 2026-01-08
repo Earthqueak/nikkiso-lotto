@@ -104,7 +104,7 @@ button:disabled {
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnRGyKMshJlFGFPU-NEBGJfEfRR5djuALsgwlp_D5FSzt2kiORRjib-nTE_rGbS2g1mQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvzC8MO-OgfykcmzcZEoWd0PJH35IGGaJ336rGMP69CEAsBHPR3QqG9mXGRQmfpGIEQg/exec";
 let isSubmitting = false;
 
 function submitForm() {
@@ -126,11 +126,15 @@ function submitForm() {
     return;
   }
 
-  // 🔥 ส่งแบบ no-cors (กัน CORS 100%)
+  const formData = new URLSearchParams();
+    formData.append("fullname", fullname);
+    formData.append("phone", phone);
+    formData.append("hospital", hospital);
+
   fetch(SCRIPT_URL, {
     method: "POST",
     mode: "no-cors",
-    body: JSON.stringify({ fullname, phone, hospital })
+    body: formData
   });
 
   // แสดงผลทันที (เหมาะหน้างาน)
