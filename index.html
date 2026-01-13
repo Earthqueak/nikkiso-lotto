@@ -99,7 +99,7 @@ button:disabled {
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0fPmEB-dtTuV4zCnjwWxLD5SyaJhZLLW5iN86QX-vSdUdMhxhjy85wjTsDEPTHFAO7g/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsXbtHHT5WXp3a2BrQBhpWTql4D5JCgvyQtwSZ6wLewTIXbhKAKorCt53yCYT6TJV-8A/exec";
 let isSubmitting = false;
 
 function submitForm() {
@@ -119,27 +119,25 @@ function submitForm() {
     resetBtn();
     return;
   }
-
+  
   fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify({ fullname, phone, hospital })
-  })
-  .then(r => r.json())
-  .then(d => {
-    document.getElementById("form").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ fullname, phone, hospital })
+});
 
-    document.getElementById("queue").innerText = d.no;
-    document.getElementById("info").innerText =
-      fullname + " | " + phone;
+// แสดงผลทันที ไม่รอ server
+document.getElementById("formSection").classList.add("hidden");
+document.getElementById("resultSection").classList.remove("hidden");
 
-    document.getElementById("qr").src =
-      "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=No:" + d.no;
-  })
-  .catch(() => {
-    alert("เกิดข้อผิดพลาด");
-    resetBtn();
-  });
+document.getElementById("queueNumber").innerText = "✔";
+document.getElementById("showName").innerText = "ชื่อ: " + fullname;
+document.getElementById("showPhone").innerText = "เบอร์: " + phone;
+document.getElementById("showHospital").innerText = "โรงพยาบาล: " + hospital;
+document.getElementById("showTime").innerText =
+  new Date().toLocaleString("th-TH");
+
 }
 
 function resetBtn() {
