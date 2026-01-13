@@ -8,149 +8,113 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0d6efd, #4dabf7);
-  padding: 20px;
+  background: linear-gradient(135deg,#0d6efd,#4dabf7);
+  padding:20px;
 }
-
 .container {
-  max-width: 420px;
-  margin: auto;
-  background: white;
-  padding: 24px;
-  border-radius: 14px;
+  max-width:400px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
 }
-
 .logo {
-  text-align: center;
-  margin-bottom: 10px;
+  text-align:center;
+  margin-bottom:10px;
 }
 .logo img {
-  max-width: 280px;
-  width: 100%;
+  max-width:260px;
 }
-
 h2 {
-  text-align: center;
-  color: #0d6efd;
-  margin-bottom: 14px;
+  text-align:center;
+  color:#0d6efd;
 }
-
-input, button {
-  width: 90%;
-  padding: 12px;
-  margin: 10px auto 0;
-  display: block;
-  font-size: 16px;
+input,button {
+  width:90%;
+  padding:12px;
+  margin:10px auto 0;
+  display:block;
 }
-
 button {
-  background: #0d6efd;
-  color: white;
-  border: none;
-  font-weight: bold;
-  border-radius: 6px;
+  background:#0d6efd;
+  color:#fff;
+  border:none;
+  font-weight:bold;
 }
-
-button:disabled {
-  opacity: 0.6;
-}
-
-.hidden { display: none; }
-
-#result {
-  text-align: center;
-  margin-top: 20px;
-}
-
+.hidden { display:none; }
 #queue {
-  font-size: 48px;
-  font-weight: bold;
-  color: #0d6efd;
-  margin: 10px 0;
+  font-size:48px;
+  color:#0d6efd;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-  <div class="logo">
-    <img src="logo.png">
-  </div>
+<div class="logo">
+  <!-- 🔴 เปลี่ยนเป็น URL โลโก้จริง -->
+  <img src="https://drive.google.com/file/d/1wuwMwBPd55xbYAmAJBbGCiSnvxHteTWN/view?usp=sharing">
+</div>
 
-  <h2>ลงทะเบียนเข้างาน</h2>
+<h2>ลงทะเบียนเข้างาน</h2>
 
-  <div id="form">
-    <input id="fullname" placeholder="ชื่อ-สกุล">
-    <input id="phone" placeholder="เบอร์โทร">
-    <input id="hospital" placeholder="โรงพยาบาล">
-    <button id="btn" onclick="submitForm()">ลงทะเบียน</button>
-  </div>
+<div id="form">
+  <input id="name" placeholder="ชื่อ-สกุล">
+  <input id="phone" placeholder="เบอร์โทร">
+  <input id="hospital" placeholder="โรงพยาบาล">
+  <button onclick="register()">ลงทะเบียน</button>
+</div>
 
-  <div id="result" class="hidden">
-    <h3>ลงทะเบียนสำเร็จ</h3>
-    <div id="queue"></div>
-    <img id="qr" width="200">
-    <p id="info"></p>
-    <button onclick="location.reload()">ลงทะเบียนคนถัดไป</button>
-  </div>
+<div id="result" class="hidden">
+  <p>หมายเลขของคุณ</p>
+  <div id="queue"></div>
+  <img id="qr" style="margin-top:15px">
+  <button onclick="location.reload()">ลงทะเบียนคนถัดไป</button>
+</div>
 
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGdUsE3BrF3i_qpBC0OWIV20AV4PBmzhEiG82XXNYk1kOLLZDyNyFtx2iGwoR5D3AgBQ/exec";
-let isSubmitting = false;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQWhQeulnEZgaCkfuqDI2VhsQTG535WRBXyFL1jFe9nEpcObZzI0EWRXq53gaCRLm9rQ/exec";
+let sending = false;
 
-function submitForm() {
-  if (isSubmitting) return;
-  isSubmitting = true;
+function register() {
+  if (sending) return;
+  sending = true;
 
-  const btn = document.getElementById("btn");
-  btn.disabled = true;
-  btn.innerText = "กำลังบันทึก...";
+  const data = {
+    fullname: name.value.trim(),
+    phone: phone.value.replace(/\D/g,""),
+    hospital: hospital.value.trim()
+  };
 
-  const fullname = fullnameInput().trim();
-  const phone = phoneInput().replace(/\D/g,"");
-  const hospital = hospitalInput().trim();
-
-  if (!fullname || !phone || !hospital) {
+  if (!data.fullname || !data.phone || !data.hospital) {
     alert("กรุณากรอกข้อมูลให้ครบ");
-    resetBtn();
+    sending = false;
     return;
   }
-  
+
   fetch(SCRIPT_URL, {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ fullname, phone, hospital })
-});
-
-// แสดงผลทันที ไม่รอ server
-document.getElementById("formSection").classList.add("hidden");
-document.getElementById("resultSection").classList.remove("hidden");
-
-document.getElementById("queueNumber").innerText = "✔";
-document.getElementById("showName").innerText = "ชื่อ: " + fullname;
-document.getElementById("showPhone").innerText = "เบอร์: " + phone;
-document.getElementById("showHospital").innerText = "โรงพยาบาล: " + hospital;
-document.getElementById("showTime").innerText =
-  new Date().toLocaleString("th-TH");
-
+    method:"POST",
+    body:JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.status !== "success") throw d;
+    form.classList.add("hidden");
+    result.classList.remove("hidden");
+    queue.innerText = d.number;
+    qr.src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+      encodeURIComponent("Queue: "+d.number);
+  })
+  .catch(() => {
+    alert("เกิดข้อผิดพลาด");
+    sending = false;
+  });
 }
-
-function resetBtn() {
-  isSubmitting = false;
-  const btn = document.getElementById("btn");
-  btn.disabled = false;
-  btn.innerText = "ลงทะเบียน";
-}
-
-const fullnameInput = () => document.getElementById("fullname").value;
-const phoneInput = () => document.getElementById("phone").value;
-const hospitalInput = () => document.getElementById("hospital").value;
 </script>
-
 </body>
 </html>
