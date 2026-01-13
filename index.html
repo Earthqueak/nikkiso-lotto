@@ -3,47 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ลงทะเบียนผู้ร่วมงาน</title>
+<title>ลงทะเบียนเข้างาน</title>
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0d6efd, #4dabf7);
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0d6efd, #4dabf7);
+  padding: 20px;
 }
+
 .container {
-    max-width: 400px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
+  max-width: 420px;
+  margin: auto;
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
 }
+
 .logo {
-    text-align: center;
-    margin-bottom: 8px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 .logo img {
-    max-width: 300px;
-    width: 100%;
+  max-width: 280px;
+  width: 100%;
 }
+
 h2 {
-    text-align: center;
-    color: #0d6efd;
-    margin: 6px 0 12px;
+  text-align: center;
+  color: #0d6efd;
+  margin-bottom: 14px;
 }
+
 input, button {
-    width: 90%;
-    padding: 12px;
-    margin: 10px auto 0;
-    display: block;
+  width: 90%;
+  padding: 12px;
+  margin: 10px auto 0;
+  display: block;
+  font-size: 16px;
 }
+
 button {
-    background: #0d6efd;
-    color: white;
-    border: none;
-    font-weight: bold;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 6px;
 }
+
+button:disabled {
+  opacity: 0.6;
+}
+
 .hidden { display: none; }
+
+#result {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#queue {
+  font-size: 48px;
+  font-weight: bold;
+  color: #0d6efd;
+  margin: 10px 0;
+}
 </style>
 </head>
 
@@ -51,46 +75,44 @@ button {
 
 <div class="container">
 
-<div class="logo">
-  <img src="logo.png">
-</div>
+  <div class="logo">
+    <img src="logo.png">
+  </div>
 
-<h2>ลงทะเบียนเข้างาน</h2>
+  <h2>ลงทะเบียนเข้างาน</h2>
 
-<div id="formSection">
-  <input id="fullname" placeholder="ชื่อ-สกุล">
-  <input id="phone" placeholder="เบอร์โทร">
-  <input id="hospital" placeholder="โรงพยาบาล">
-  <button id="submitBtn" onclick="submitForm()">ลงทะเบียน</button>
-</div>
+  <div id="form">
+    <input id="fullname" placeholder="ชื่อ-สกุล">
+    <input id="phone" placeholder="เบอร์โทร">
+    <input id="hospital" placeholder="โรงพยาบาล">
+    <button id="btn" onclick="submitForm()">ลงทะเบียน</button>
+  </div>
 
-<div id="resultSection" class="hidden">
-  <h3>ลงทะเบียนสำเร็จ</h3>
-  <h1 id="queueNumber"></h1>
-  <p id="showName"></p>
-  <p id="showPhone"></p>
-  <p id="showHospital"></p>
-  <p id="showTime"></p>
-</div>
+  <div id="result" class="hidden">
+    <h3>ลงทะเบียนสำเร็จ</h3>
+    <div id="queue"></div>
+    <img id="qr" width="200">
+    <p id="info"></p>
+    <button onclick="location.reload()">ลงทะเบียนคนถัดไป</button>
+  </div>
 
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwE611tWyFfrz9MIVYq-Hc7B9_LzO_t0LcScXuHdI7GQqerV_E_mNRproGEdETSIQZOtg/exec";
+const SCRIPT_URL = "ใส่_URL_exec_ตรงนี้";
 let isSubmitting = false;
 
 function submitForm() {
-
   if (isSubmitting) return;
   isSubmitting = true;
 
-  const btn = document.getElementById("submitBtn");
+  const btn = document.getElementById("btn");
   btn.disabled = true;
   btn.innerText = "กำลังบันทึก...";
 
-  const fullname = fullname.value.trim();
-  const phone = phone.value.replace(/\D/g,"");
-  const hospital = hospital.value.trim();
+  const fullname = fullnameInput().trim();
+  const phone = phoneInput().replace(/\D/g,"");
+  const hospital = hospitalInput().trim();
 
   if (!fullname || !phone || !hospital) {
     alert("กรุณากรอกข้อมูลให้ครบ");
@@ -104,18 +126,15 @@ function submitForm() {
   })
   .then(r => r.json())
   .then(d => {
-    if (d.status === "duplicate") {
-      alert("เบอร์นี้ลงทะเบียนแล้ว");
-      resetBtn();
-      return;
-    }
-    formSection.classList.add("hidden");
-    resultSection.classList.remove("hidden");
-    queueNumber.innerText = d.number;
-    showName.innerText = "ชื่อ: " + fullname;
-    showPhone.innerText = "เบอร์: " + phone;
-    showHospital.innerText = "โรงพยาบาล: " + hospital;
-    showTime.innerText = new Date().toLocaleString("th-TH");
+    document.getElementById("form").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+
+    document.getElementById("queue").innerText = d.no;
+    document.getElementById("info").innerText =
+      fullname + " | " + phone;
+
+    document.getElementById("qr").src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=No:" + d.no;
   })
   .catch(() => {
     alert("เกิดข้อผิดพลาด");
@@ -125,9 +144,14 @@ function submitForm() {
 
 function resetBtn() {
   isSubmitting = false;
-  submitBtn.disabled = false;
-  submitBtn.innerText = "ลงทะเบียน";
+  const btn = document.getElementById("btn");
+  btn.disabled = false;
+  btn.innerText = "ลงทะเบียน";
 }
+
+const fullnameInput = () => document.getElementById("fullname").value;
+const phoneInput = () => document.getElementById("phone").value;
+const hospitalInput = () => document.getElementById("hospital").value;
 </script>
 
 </body>
